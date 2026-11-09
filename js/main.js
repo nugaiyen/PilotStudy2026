@@ -7,7 +7,7 @@ const map = new mapboxgl.Map({
     style: "mapbox://styles/mapbox/streets-v12",  // just default
     center: [-122.50, 47.22],  //pierce county
     zoom: 10
-})
+});
 
 
  // wait until the map finishes loading
@@ -23,13 +23,25 @@ const map = new mapboxgl.Map({
     // this part is just for testing data
     // dots are so seperate and tiny
     // will change it later
+   //map.addLayer({
+     //   id: "housing-dots",
+     //   type: "circle",
+     //   source: "housing",
+     //   paint: {
+        //    "circle-radius": 5,
+        //    "circle-color": "#FF0329"
+    //    }
+    //});
+
+    // trying color-filled polygon
+    // do not edit this part yet
     map.addLayer({
-        id: "housing-dots",
-        type: "circle",
+        id: "housing-polygon",
+        type: "fill",
         source: "housing",
         paint: {
-            "circle-radius": 5,
-            "circle-color": "#FF0329"
+            "fill-color": "#FFZ039",
+            "fill-opacity": 1
         }
     });
 
@@ -50,6 +62,4 @@ const map = new mapboxgl.Map({
             "fill-opacity": 0.2
         }
     });
-
-
 });
