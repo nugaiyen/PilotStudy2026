@@ -1,10 +1,137 @@
-/* moved here */
-body {
+* {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
 }
 
 #map {
+    flex: 1;
+    height: 100%;
     width: 100%;
-    height: 100vh;
+    min-width: 0;
+    position: relative;
+
 }
+
+/* Navigation bar */
+.navbar {
+    height: 65px;
+    width: 100%;
+    background-color: #075985;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 70px;
+    box-sizing: border-box;
+}
+
+.nav-title h1 {
+    font-size: 22px;
+    margin: 0;
+}
+
+.nav-title p {
+    font-size: 12px;
+    margin: 5px 0 0;
+    color: #DCEAF2;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.nav-search {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.nav-search input {
+    width: 220px;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+}
+
+.nav-search button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.nav-links {
+    display: flex;
+    gap: 20px;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+}
+/* End avigation bar */
+
+
+/* Main layout */
+.main-container {
+    display: flex;
+    width: 100%;
+    height: calc(100vh - 65px);
+}
+
+/* Sidebar */
+.main-container {
+    display: flex;
+    height: calc(100vh - 65px);
+}
+
+.container {
+    width: 320px;
+    flex-shrink: 0;
+    background-color: #F5F5F0;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.container h2 {
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: #163B5C;
+}
+
+.building-photo img {
+    width: 100%;
+    height: 190px;
+    object-fit: cover;
+    border-radius: 6px;
+    background-color: #ddd;
+}
+
+.building-details {
+    margin-top: 20px;
+}
+
+.building-details h3 {
+    font-size: 15px;
+    margin-bottom: 8px;
+}
+
+.building-details p {
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.building-details a {
+    color: #075985;
+    font-size: 14px;
+    text-decoration: none;
+}
+/* End sidebar */

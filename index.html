@@ -15,24 +15,68 @@
     <!-- this would link to our own css file lets do seperately -->
     <link rel="stylesheet" href="css/style.css">
 
-    <!-- gonna move these to the css -->
-    <!-- <style>
-        body {
-            margin: 0;
-            padding: 0;
-        }
-
-        #map {
-            width: 100%;
-            height: 100vh;
-        }
-    </style> -->
-
 </head>
 
 <body>
 
-    <div id="map"></div>
+    <!-- Navigation Bar -->
+    <header class="navbar">
+        <div class="nav-title">
+            <h1>Pierce County Pilot Study</h1>
+            <p>Residential Building Identification</p>
+        </div>
+
+        <div class="nav-right">
+            <div class="nav-search">
+                <input type="text" placeholder="Search address or parcel...">
+                <button>Search</button>
+            </div>
+
+            <nav class="nav-links">
+                <a href="#">Map</a>
+                <a href="#">About</a>
+                <a href="#">Data</a>
+            </nav>
+        </div>
+    </header>
+    <!-- End navigation Bar -->
+
+
+    <div class="main-container">
+        <!-- Left building information panel -->
+        <aside class="container">
+
+            <h2>Building Information</h2>
+
+            <div class="building-photo">
+                <img src="assets/building-placeholder.jpg"
+                    alt="Building photo">
+            </div>
+
+            <div class="building-details">
+                <h3>Property Address</h3>
+                <p id="address">Select a building on the map</p>
+
+                <a id="google-maps-link"
+                href="#"
+                target="_blank">
+                    View on Google Maps
+                </a>
+            </div>
+        </aside>
+        <!-- End left building information panel -->
+
+        <!-- Map -->
+        <div id="map"></div>
+
+    </div>
+
+
+
+<div id="map"></div>
+
+
+
 
     <!-- this would link to our js functions -->
     <script src="js/main.js"></script>
