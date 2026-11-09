@@ -76,7 +76,19 @@ body {
     color: white;
     text-decoration: none;
     font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
 }
+
+/* Active page */
+.nav-links a.active {
+    color:#87ff99;
+    padding: 7px 20px;
+    font-weight: bold;
+    border-radius: 20px;
+    background-color: #98e6a418;
+} 
 /* End avigation bar */
 
 
@@ -86,6 +98,8 @@ body {
     width: 100%;
     height: calc(100vh - 65px);
 }
+
+
 
 /* Sidebar */
 .main-container {
@@ -100,6 +114,7 @@ body {
     padding: 20px;
     overflow-y: auto;
 }
+
 
 .container h2 {
     font-size: 20px;
@@ -135,3 +150,11 @@ body {
     text-decoration: none;
 }
 /* End sidebar */
+
+/* Data page */ 
+.data-page .container {
+    width: 100%;
+    height: 100vh;
+    background-color: #F5F5F0;
+    padding: 25px;
+}
