@@ -56,11 +56,22 @@
                 <h3>Property Address</h3>
                 <p id="address">Select a building on the map</p>
 
+                <div id="parcel-details" hidden>
+                    <p>Parcel Number: <span id="selected-parcel-number"></span></p>
+                </div>
+
                 <a id="google-maps-link"
                 href="#"
                 target="_blank">
                     View on Google Maps
                 </a>
+            </div>
+
+            <div class="parcel-directory">
+                <h3>Candidate Parcels</h3>
+                <p id="parcel-count">Loading parcels...</p>
+
+                <div id="parcel-list"></div>
             </div>
         </aside>
         <!-- End left building information panel -->

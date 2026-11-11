@@ -10,14 +10,104 @@ const map = new mapboxgl.Map({
 });
 
 
+const parcelLookup = new Map();
+
+// Collecting boundaries of every polygon belonging to a parcel
+function extendBounds(bounds, coords) {
+    if (typeof coords[0] === 'number') {
+        bounds.extend(coords);
+    } else {
+        coords.forEach(part => extendBounds(bounds, part));
+    }
+}
+
+// Select a parcel from the map or sidebar
+function selectParcel(parcelNumber) {
+    const parcel = parcelLookup.get(parcelNumber);
+    if (!parcel) return;
+
+    // Zoom to the selected parcel
+    map.fitBounds(parcel.bounds, {
+        padding: 75,
+        maxZoom: 17,
+        duration: 850
+    });
+
+    // Highlight polygons with this parcel number
+    map.setFilter("housing-selected", [
+        "==",
+        ["get", "Parcel Number"],
+        parcelNumber
+    ]);
+
+    // Update building information
+    document.getElementById("address").textContent = parcel.address;
+    document.getElementById("selected-parcel-number").textContent = parcelNumber;
+    document.getElementById("parcel-details").hidden = false;
+    document.getElementById("selected-hvac").textContent = parcel.hvac;
+
+    // Update Google Maps Link
+    const googleMapsLink = document.getElementById("google-maps-link");
+
+    googleMapsLink.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(parcel.address + ", Pierce County, WA")}`;
+
+    // Highlight the selected parcel in the sidebar
+    document.querySelectorAll(".parcel-item").forEach(button => {
+        button.classList.toggle(
+            "selected",
+            button.getAttribute("data-parcel") === parcelNumber
+        );
+    });
+}
+   
+/////////////////////////////////////////////////////////
  // wait until the map finishes loading
- map.on("load", () => {
+ map.on("load", async () => {
+
+    try {
+        // Fetch GeoJSON so that JS can access its features
+        const response = await fetch("assets/combinedNEW4326.geojson");
+
+        if(!response.ok) {
+            throw new Error("Unable to load GeoJSON");
+        }
+
+        const geojson = await response.json();
+
 
     // load the GeoJSON data
     map.addSource("housing", {
         type: "geojson",
         data: "assets/combinedNEW4326.geojson"
     });
+
+
+
+        // Group repeated polygons by their unique parcel number
+        for (const feature of geojson.features) {
+            const id = String(
+                feature.properties["Parcel Number"] ?? ""
+            ).trim();
+
+            if (!id || !feature.geometry) continue;
+
+            if (!parcelLookup.has(id)) {
+                parcelLookup.set(id, {
+                    address: feature.properties.Site_Addre ||
+                        "Address unavailable",
+                        hvac: feature.properties["HVAC Description"] ||
+                        "Unknown",
+                        bounds: new mapboxgl.LngLatBounds()
+                });
+            }
+
+        extendBounds(
+        parcelLookup.get(id).bounds,
+        feature.geometry.coordinates
+        );
+    }
+
+
 
     // create dots for each parcel
     // this part is just for testing data
@@ -40,7 +130,7 @@ const map = new mapboxgl.Map({
         type: "fill",
         source: "housing",
         paint: {
-            "fill-color": "#FFZ039",
+            "fill-color": "#FF2020",
             "fill-opacity": 1
         }
     });
@@ -58,8 +148,119 @@ const map = new mapboxgl.Map({
         type: "fill",
         source: "pierce-county",
         paint: {
-            "fill-color": "#5452BF",
+            "fill-color": "#3440bc",
             "fill-opacity": 0.2
         }
     });
+
+
+    // Red parcel outlines
+    map.addLayer({
+        id: "housing-outline",
+        type: "line",
+        source: "housing",
+        paint: {
+            "line-color": "#CC0000",
+            "line-width": 3
+        }
+    });
+
+
+    // Highlight selected parcels in yellow
+    map.addLayer({
+        id: "housing-selected",
+        type: "line",
+        source: "housing",
+        filter: ["==", ["get", "Parcel Number"], ""],
+        paint: {
+            "line-color": "#FFE600",
+            "line-width": 5
+        }
+    });
+
+    // One marker per unique parcel
+    const markers = {
+        type: "FeatureCollection",
+        features: [...parcelLookup].map(([id, parcel]) => {
+            const center = parcel.bounds.getCenter();
+
+            return {
+                type: "Feature",
+                properties: {
+                    "Parcel Number": id,
+                },
+                geometry: {
+                    type: "Point",
+                    coordinates: [center.lng, center.lat]
+                }
+            };
+        })
+    };
+
+    map.addSource("parcel-markers", {
+        type: "geojson",
+        data: markers
+    });
+
+    // Visible markers are lower zoom levels
+    map.addLayer({
+        id: "parcel-markers",
+        type: "circle",
+        source: "parcel-markers",
+        maxzoom: 14,
+        paint: {
+            "circle-color": "#FF2020",
+            "circle-radius": 7,
+            "circle-stroke-color": "#FFFFFF",
+            "circle-stroke-width": 2
+        }
+    });
+
+    // Click polygon or marker to select a parcel
+    ["housing-polygon", "parcel-markers"].forEach(layer => {
+        map.on("click", layer, event => {
+            const id = String(
+                event.features[0].properties["Parcel Number"]
+            );
+
+            selectParcel(id);
+        });
+    });
+
+        // Create clickable list in left sidebar
+        const list = document.getElementById("parcel-list");
+
+        const sortedParcels = [...parcelLookup.entries()].sort(
+            (a, b) => a[1].address.localeCompare(b[1].address)
+        );
+
+        for (const [id, parcel] of sortedParcels) {
+            const button = document.createElement("button");
+
+            button.type = "button";
+            button.className = "parcel-item";
+            button.dataset.parcel = id;
+
+            const address = document.createElement("strong");
+            address.textContent = parcel.address;
+
+            const number = document.createElement("small");
+            number.textContent = "Parcel " + id;
+
+            button.append(address, number);
+
+            button.addEventListener("click", () => {
+                selectParcel(id);
+            });
+
+            list.append(button);
+        }
+
+        document.getElementById("parcel-count").textContent =
+            parcelLookup.size + " unique parcels";
+
+    } catch (error) {
+        console.error("Error loading parcel data:", error);
+    }
+
 });
