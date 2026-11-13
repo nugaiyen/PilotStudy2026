@@ -283,7 +283,7 @@ function selectParcel(parcelNumber) {
     }
 
 });
-
+/////////////////// reset button here ///////////////////////////////////////
 // reset the map
 document.getElementById("reset-map").addEventListener("click", () => {
 
@@ -312,3 +312,46 @@ document.getElementById("reset-map").addEventListener("click", () => {
         button.classList.remove("selected");
     });
 });
+/////////////////// end reset button here ////////////////////////////////////
+
+/////////////////// resize sidebar here //////////////////////////////////////
+// resize sidebar by dragging its right edge
+const sidebar = document.getElementById("sidebar");
+const resizer = document.getElementById("sidebar-resizer");
+
+let isResizing = false;
+
+// start resizing when user press the edge
+resizer.addEventListener("pointerdown", (e) => {
+    isResizing = true;
+    resizer.setPointerCapture(e.pointerId);
+    document.body.style.userSelect = "none";
+});
+
+// lindsay buying crackers
+// no chile limon
+// change sidebar width (on drag ..?)
+resizer.addEventListener("pointermove", (e) => {
+    if (!isResizing) return;
+
+    // in the range 220px to 600px maybe no
+    // to 500? no still 600
+    const left = sidebar.getBoundingClientRect().left;
+    const width = Math.max(220, Math.min(600, e.clientX - left));
+
+    sidebar.style.width = width + "px";
+
+    // tell mapbox its container changed size
+    map.resize();
+});
+
+// stop resize
+function stopResizing() {
+    isResizing = false;
+    document.body.style.userSelect = "";
+    map.resize();
+}
+
+resizer.addEventListener("pointerup", stopResizing);
+resizer.addEventListener("pointercancel", stopResizing);
+/////////////////// end resize sidebar here ///////////////////////////////////

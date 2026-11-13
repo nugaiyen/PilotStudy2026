@@ -158,3 +158,31 @@ body {
     background-color: #F5F5F0;
     padding: 25px;
 }
+
+/* just for display feel free to adjust this outlook? outlook? appearance? nah idk */
+/* resize sidebar */ /* resize sidebar */ /* resize sidebar */ /* resize sidebar */
+#sidebar {
+    position: relative;
+    width: 350px;
+    min-width: 220px;
+    max-width: 600px;
+    flex-shrink: 0;
+    box-sizing: border-box;
+}
+
+/* so you can drag it i mean the sizebar */
+#sidebar-resizer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 8px;
+    height: 100%;
+    cursor: col-resize;
+    z-index: 10;
+}
+
+/* show draggable edge on hover */
+#sidebar-resizer:hover {
+    background-color: #3440bc;
+}
+/* end resize sidebar */ /* end resize sidebar */ /* end resize sidebar */ /* end resize sidebar */
