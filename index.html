@@ -29,7 +29,7 @@
 
             <div class="nav-button">
                 <div class="dropdown-wrapper">
-                    <button type="button" id="data-btn">Data</button>
+                    <button type="button" id="data-btn">Data Sources</button>
                     <div id="data-popup" class="dropdown-popup">
                         <h3>Datasets Used</h3>
                         <a href="https://gisdata-piercecowa.opendata.arcgis.com/datasets/piercecowa::tax-parcels/explore?location=47.068072%2C-122.155081%2C0.00" target="_blank">Pierce County Parcels</a>
@@ -39,9 +39,7 @@
             </div>
   
     </header> <!-- end nav bar -->
-
-
-
+    
 
     <div class="main-container">
         <!-- Left building information panel -->
@@ -105,7 +103,7 @@
                     <p id="parcel-count">Loading properties...</p>
                 </div>
 
-                <button id="reset-map">Reset Selection</button>
+                <button class="reset-map">Reset Location</button>
             </div>
 
             <div id="parcel-list"></div>
@@ -114,7 +112,9 @@
         <!-- End left building information panel -->
 
         <!-- Map -->
-        <div id="map"></div>
+        <div id="map">
+             <button class="reset-map" style = "position: absolute" ;>Reset Location</button>
+        </div>
 
     </div>
 

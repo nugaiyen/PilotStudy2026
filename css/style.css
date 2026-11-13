@@ -217,7 +217,7 @@ body {
 }
  
 /* Reset map */
-#reset-map {
+.reset-map {
     white-space: nowrap;
     cursor: pointer;
     padding: 9px 10px;
@@ -233,24 +233,32 @@ body {
     transition: all 0.2s ease;
 }
 
-#reset-map:hover {
+.reset-map:hover {
     background-color: #e9f0f4;
     border-color: #075985;
 }
 
-#reset-map:active {
+.reset-map:active {
     transform: scale(0.97);
 }
 
-#reset-map:disabled {
+.reset-map:disabled {
     opacity: 0.45;
     cursor: not-allowed;
 }
-
-
-
-
 /* End reset map */
+
+/* Only position the button inside the map */
+#map .reset-map {
+    position: absolute;
+    top: 8px;
+    right: 50px;
+    z-index: 10;
+    background-color:#ffffff;
+    color: #3FB1CE;
+    border-color: #b0afaf83;
+    border-width: 2px;
+}
 
 .parcel-directory {
     margin-top: 24px;
@@ -329,7 +337,6 @@ body {
 }
 
 /* Expand/collapse indicator */
-
 .property-group summary::after {
     content: "⌄";
     font-size: 18px;
@@ -342,7 +349,6 @@ body {
 }
 
 /* Individual parcel buttons */
-
 .property-units {
     display: flex;
     flex-direction: column;
@@ -391,13 +397,11 @@ body {
     background-color: #fff5e5;
     border: 2px solid #d6a828;
 }
-
 /* End candidate property directory */
 
 
 
 /* Building photograph placeholder */
-
 .photo-placeholder {
     width: 100%;
     min-height: 190px;
@@ -435,12 +439,10 @@ body {
     line-height: 1.5;
     max-width: 220px;
 }
-
 /* End building photograph placeholder */
 
 
 /* Location */
-
 .maplibregl-ctrl-top-right {
     display: block;
     z-index: 10;
@@ -449,4 +451,4 @@ body {
 .maplibregl-ctrl-group {
     display: block;
 }
-
+/* End location 
