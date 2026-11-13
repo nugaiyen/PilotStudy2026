@@ -24,25 +24,43 @@ function extendBounds(bounds, coords) {
 }
 
 // building photo on the side bar using google street view
-function updateBuildingPhoto(address){
-    // show the photo when parcel is selected
-    document.getElementById("building-photo").style.display = "block";
+function updateBuildingPhoto(address) {
 
     const photo = document.getElementById("building-photo");
+    const placeholder = document.getElementById("photo-placeholder");
+
+    // Hide placeholder and show photograph
+    placeholder.hidden = true;
+    photo.style.display = "block";
+
     const location = address + ", Pierce County, WA";
     const url = new URL("https://maps.googleapis.com/maps/api/streetview");
 
     url.searchParams.set("size", "600x300");
     url.searchParams.set("location", location);
-    url.searchParams.set("key", GOOGLE_MAPS_API_KEY)
+    url.searchParams.set("key", GOOGLE_MAPS_API_KEY);
+
+    photo.onerror = () => {
+        photo.style.display = "none";
+        placeholder.textContent = "Street View image unavailable for this property.";
+        placeholder.hidden = false;
+    };
+
     photo.src = url.toString();
 }
 
+
 // Select a parcel from the map or sidebar
 // and just realize we need a reset button i will make it P
+
 function selectParcel(parcelNumber) {
+
     const parcel = parcelLookup.get(parcelNumber);
-    if (!parcel) return;
+
+    if (!parcel) {
+        console.warn("Parcel not found:", parcelNumber);
+        return;
+    }
 
     // Zoom to the selected parcel
     map.fitBounds(parcel.bounds, {
@@ -51,7 +69,7 @@ function selectParcel(parcelNumber) {
         duration: 850
     });
 
-    // Highlight polygons with this parcel number
+    // Highlight the selected parcel on the map
     map.setFilter("housing-selected", [
         "==",
         ["get", "Parcel Number"],
@@ -59,25 +77,52 @@ function selectParcel(parcelNumber) {
     ]);
 
     // Update building information
-    document.getElementById("address").textContent = parcel.address;
-    updateBuildingPhoto(parcel.address);  // show the selected property's street view photo
-    document.getElementById("selected-parcel-number").textContent = parcelNumber;
+    document.getElementById("address").textContent =
+        parcel.address;
+
+    document.getElementById("selected-parcel-number").textContent =
+        parcelNumber;
+
+    document.getElementById("selected-hvac").textContent =
+        parcel.hvac;
+
     document.getElementById("parcel-details").hidden = false;
-    document.getElementById("selected-hvac").textContent = parcel.hvac;
 
-    // Update Google Maps Link
-    const googleMapsLink = document.getElementById("google-maps-link");
+    // Update Street View photograph
+    updateBuildingPhoto(parcel.address);
 
-    googleMapsLink.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(parcel.address + ", Pierce County, WA")}`;
+    // Update Google Maps link
+    const googleMapsLink =
+        document.getElementById("google-maps-link");
 
-    // Highlight the selected parcel in the sidebar
+    googleMapsLink.href =
+        "https://www.google.com/maps/search/?api=1&query=" +
+        encodeURIComponent(parcel.address + ", Pierce County, WA");
+
+    googleMapsLink.hidden = false;
+
+    // Highlight selected parcel in the sidebar
     document.querySelectorAll(".parcel-item").forEach(button => {
-        button.classList.toggle(
-            "selected",
-            button.getAttribute("data-parcel") === parcelNumber
-        );
+
+        const isSelected =
+            button.dataset.parcel === parcelNumber;
+
+        button.classList.toggle("selected", isSelected);
+
+        if (isSelected) {
+            const selectedGroup =
+                button.closest(".property-group");
+
+            if (selectedGroup) {
+                // Expand only the selected property group
+                document.querySelectorAll(".property-group").forEach(group => {
+                    group.open = (group === selectedGroup);
+                });
+            }
+        }
     });
 }
+
    
 /////////////////////////////////////////////////////////
  // wait until the map finishes loading
@@ -231,6 +276,49 @@ function selectParcel(parcelNumber) {
         }
     });
 
+
+    // Highlight parcel markers when hovering over sidebar entries
+    map.addLayer({
+        id: "parcel-markers-hover",
+        type: "circle",
+        source: "parcel-markers",
+        filter: [
+            "==",
+            ["get", "Parcel Number"],
+            "__none__"
+        ],
+        paint: {
+            "circle-color": "#FF2020",
+            "circle-radius": 10,
+            "circle-stroke-color": "#FFE600",
+            "circle-stroke-width": 5,
+            "circle-opacity": 1
+        }
+    });
+
+
+
+    // Highlight specific parcels on the map
+    function highlightParcelMarkers(parcelIds) {
+        map.setFilter("parcel-markers-hover", [
+            "in",
+            ["get", "Parcel Number"],
+            ["literal", parcelIds]
+        ]);
+    }
+
+    // Remove hover highlight
+    function clearParcelMarkerHover() {
+        map.setFilter("parcel-markers-hover", [
+            "==",
+            ["get", "Parcel Number"],
+            "__none__"
+        ]);
+    }
+
+
+
+
     // Click polygon or marker to select a parcel
     ["housing-polygon", "parcel-markers"].forEach(layer => {
         map.on("click", layer, event => {
@@ -282,37 +370,134 @@ function selectParcel(parcelNumber) {
     });
     //////////////// end new popup & hover function //////////////////
 
-        // Create clickable list in left sidebar
-        const list = document.getElementById("parcel-list");
 
-        const sortedParcels = [...parcelLookup.entries()].sort(
-            (a, b) => a[1].address.localeCompare(b[1].address)
+
+
+    // Group parcels by their shared street address.
+    function getGroupAddress(address) {
+        return address.trim()
+            .replace(/\s+/g, " ")
+            .replace(/\s+UNIT\s+.*$/i, "");
+    }
+
+    const list = document.getElementById("parcel-list");
+    list.replaceChildren();
+
+    const propertyGroups = new Map();
+
+    // Organize individual parcels into address groups.
+    for (const [id, parcel] of parcelLookup.entries()) {
+        const groupAddress = getGroupAddress(parcel.address);
+
+        if (!propertyGroups.has(groupAddress)) {
+            propertyGroups.set(groupAddress, []);
+        }
+
+        propertyGroups.get(groupAddress).push({ id, parcel });
+    }
+
+    // Sort property groups alphabetically by address.
+    const sortedGroups = [...propertyGroups.entries()].sort(
+        (a, b) => a[0].localeCompare(b[0], undefined, { numeric: true })
+    );
+
+    for (const [groupAddress, parcels] of sortedGroups) {
+
+        // Each property group is an expandable card.
+        const group = document.createElement("details");
+        group.className = "property-group";
+        group.name = "candidate-properties";
+
+        const heading = document.createElement("summary");
+
+        const title = document.createElement("span");
+        title.className = "property-title";
+        title.textContent = groupAddress;
+
+
+
+        // Highlight this property's parcels when hovering
+        heading.addEventListener("mouseenter", () => {
+            const parcelIds = parcels.map(item => item.id);
+            highlightParcelMarkers(parcelIds);
+        });
+
+        // Remove highlight when mouse leaves
+        heading.addEventListener("mouseleave", () => {
+            clearParcelMarkerHover();
+        });
+
+
+
+
+        const count = document.createElement("small");
+        count.className = "property-count";
+        count.textContent = parcels.length === 1
+            ? "1 parcel"
+            : `${parcels.length} parcels`;
+
+        heading.append(title, count);
+        group.append(heading);
+
+        // Container for individual units/parcels.
+        const unitList = document.createElement("div");
+        unitList.className = "property-units";
+
+        parcels.sort((a, b) =>
+            a.parcel.address.localeCompare(
+                b.parcel.address,
+                undefined,
+                { numeric: true }
+            )
         );
 
-        for (const [id, parcel] of sortedParcels) {
+        for (const { id, parcel } of parcels) {
             const button = document.createElement("button");
 
             button.type = "button";
             button.className = "parcel-item";
             button.dataset.parcel = id;
 
-            const address = document.createElement("strong");
-            address.textContent = parcel.address;
+            // Display the unit identifier separately.
+            const unitMatch = parcel.address.match(/\bUNIT\s+(.+)$/i);
 
-            const number = document.createElement("small");
-            number.textContent = "Parcel " + id;
+            const unitLabel = document.createElement("strong");
+            unitLabel.textContent = unitMatch
+                ? `Unit ${unitMatch[1]}`
+                : "View parcel";
 
-            button.append(address, number);
+            const parcelNumber = document.createElement("small");
+            parcelNumber.textContent = `Parcel ${id}`;
 
+            button.append(unitLabel, parcelNumber);
+
+            // Preserve existing click-to-zoom functionality.
             button.addEventListener("click", () => {
                 selectParcel(id);
             });
 
-            list.append(button);
+
+
+            // Highlight this specific unit when hovering
+            button.addEventListener("mouseenter", () => {
+                highlightParcelMarkers([id]);
+            });
+
+            button.addEventListener("mouseleave", () => {
+                clearParcelMarkerHover();
+            });
+
+
+            unitList.append(button);
         }
 
-        document.getElementById("parcel-count").textContent =
-            parcelLookup.size + " unique parcels";
+        group.append(unitList);
+        list.append(group);
+    }
+
+    document.getElementById("parcel-count").textContent =
+        `${propertyGroups.size} address groups · ${parcelLookup.size} parcels`;
+
 
     } catch (error) {
         console.error("Error loading parcel data:", error);
@@ -320,34 +505,59 @@ function selectParcel(parcelNumber) {
 
 });
 /////////////////// reset button here ///////////////////////////////////////
+
+
+
 // reset the map
-document.getElementById("reset-map").addEventListener("click", () => {
+    document.getElementById("reset-map").addEventListener("click", () => {
 
-    // return to the original pierce county view
-    map.flyTo({
-        center: [-122.50, 47.22],
-        zoom: 10
+        // Return to the original Pierce County view
+        map.flyTo({
+            center: [-122.50, 47.22],
+            zoom: 10
+        });
+
+        // Remove selected parcel highlight
+        map.setFilter("housing-selected", [
+            "==",
+            ["get", "Parcel Number"],
+            ""
+        ]);
+
+        // Reset building information
+        document.getElementById("address").textContent =
+            "Select a building on the map or from the list to view its details.";
+
+        document.getElementById("selected-parcel-number").textContent = "";
+        document.getElementById("selected-hvac").textContent = "";
+        document.getElementById("parcel-details").hidden = true;
+
+        // Hide building photo
+        document.getElementById("building-photo").style.display = "none";
+        const placeholder = document.getElementById("photo-placeholder");
+        placeholder.textContent = "";
+        placeholder.innerHTML = `
+            <span class="photo-icon">▧</span>
+            <strong>Property Street View</strong>
+            <p>Select a parcel on the map or from the list to view its photograph.</p>
+        `;
+        placeholder.hidden = false;
+
+
+        // Hide Google Maps link
+        document.getElementById("google-maps-link").hidden = true;
+
+        // Clear all selected parcel buttons
+        document.querySelectorAll(".parcel-item").forEach(button => {
+            button.classList.remove("selected");
+        });
+
+        // Collapse all property groups
+        document.querySelectorAll(".property-group").forEach(group => {
+            group.open = false;
+        });
+
     });
-
-    // remove selected parcel hightlight
-    map.setFilter("housing-selected", [
-        "==",
-        ["get", "Parcel Number"],
-        ""
-    ]);
-
-    // reset building info
-    document.getElementById("selected-parcel-number").textContent = "";
-    document.getElementById("parcel-details").hidden = true;
-
-    // restore the default photo or no i dont know what should we put back there
-    document.getElementById("building-photo").style.display = "none";
-
-    // clear the selected parcel in the sidebar
-    document.querySelectorAll(".parcel-item").forEach(button => {
-        button.classList.remove("selected");
-    });
-});
 /////////////////// end reset button here ////////////////////////////////////
 
 /////////////////// resize sidebar here //////////////////////////////////////

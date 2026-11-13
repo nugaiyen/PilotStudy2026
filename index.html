@@ -51,17 +51,21 @@
             <button id="reset-map">Reset Map</button>
 
             <div class="building-photo">
-                <!-- note: just in case i cant find this line highlighthighlighthighlight -->
-                <!-- <img src="assets/building-placeholder.jpg"
-                    alt="Building photo"> -->
+                <div id="photo-placeholder" class="photo-placeholder">
+                    <span class="photo-icon">▧</span>
+                    <strong>Property Street View</strong>
+                    <p>Select a parcel on the map or from the list to view its photograph.</p>
+                </div>
+
                 <img id="building-photo"
-                     src="assets/building-placeholder.jpg"
-                     alt="Building photo"
+                    alt="Street View of selected property"
+                    style="display: none;">
             </div>
+
 
             <div class="building-details">
                 <h3>Property Address</h3>
-                <p id="address">Select a building on the map</p>
+                <p id="address">Select a building on the map or from the list to view its details.</p>
 
                 <div id="parcel-details" hidden>
                     <p>Parcel Number: <span id="selected-parcel-number"></span></p>
@@ -71,14 +75,16 @@
 
                 <a id="google-maps-link"
                 href="#"
-                target="_blank">
+                target="_blank"
+                rel="noopener noreferrer"
+                hidden>
                     View on Google Maps
                 </a>
             </div>
 
             <div class="parcel-directory">
-                <h3>Candidate Parcels</h3>
-                <p id="parcel-count">Loading parcels...</p>
+                <h3>Candidate Properties</h3>
+                <p id="parcel-count">Loading properties...</p>
 
                 <div id="parcel-list"></div>
             </div>
@@ -90,10 +96,6 @@
         <div id="map"></div>
 
     </div>
-
-
-
-<div id="map"></div>
 
 
 

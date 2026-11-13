@@ -186,3 +186,193 @@ body {
     background-color: #3440bc;
 }
 /* end resize sidebar */ /* end resize sidebar */ /* end resize sidebar */ /* end resize sidebar */
+
+
+
+/* Candidate property directory */
+
+.parcel-directory {
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px solid #D7DFE5;
+}
+
+.parcel-directory h3 {
+    font-size: 17px;
+    color: #163B5C;
+    margin-bottom: 6px;
+}
+
+#parcel-count {
+    color: #667085;
+    font-size: 12px;
+    margin-bottom: 14px;
+}
+
+#parcel-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Individual property groups */
+
+.property-group {
+    background: #FFFFFF;
+    border: 1px solid #D7DFE5;
+    border-radius: 9px;
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.property-group:hover {
+    border-color: #80AFC6;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.property-group summary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 12px;
+    cursor: pointer;
+    list-style: none;
+}
+
+.property-group summary::-webkit-details-marker {
+    display: none;
+}
+
+.property-group summary:hover {
+    background-color: #EDF5FA;
+}
+
+.property-group summary:focus-visible {
+    outline: 2px solid #075985;
+    outline-offset: -2px;
+}
+
+.property-title {
+    flex: 1;
+    min-width: 0;
+    font-weight: 600;
+    color: #163B5C;
+    font-size: 13px;
+    overflow-wrap: anywhere;
+}
+
+.property-count {
+    font-size: 11px;
+    color: #667085;
+    white-space: nowrap;
+}
+
+/* Expand/collapse indicator */
+
+.property-group summary::after {
+    content: "⌄";
+    font-size: 18px;
+    color: #667085;
+    transition: transform 0.2s;
+}
+
+.property-group[open] summary::after {
+    transform: rotate(180deg);
+}
+
+/* Individual parcel buttons */
+
+.property-units {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px;
+    border-top: 1px solid #E5E7EB;
+}
+
+.parcel-item {
+    width: 100%;
+    display: block;
+    text-align: left;
+    padding: 10px 12px;
+    background: #F6F8FA;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.parcel-item strong {
+    display: block;
+    font-size: 13px;
+    color: #163B5C;
+    margin-bottom: 5px;
+}
+
+.parcel-item small {
+    display: block;
+    font-size: 11px;
+    color: #667085;
+}
+
+.parcel-item:hover {
+    background-color: #FFF0F0;
+    border-color: #E53935;
+}
+
+.parcel-item:focus-visible {
+    outline: 2px solid #075985;
+    outline-offset: 2px;
+}
+
+.parcel-item.selected {
+    background-color: #FFE5E5;
+    border: 2px solid #D62828;
+}
+
+/* End candidate property directory */
+
+
+
+/* Building photograph placeholder */
+
+.photo-placeholder {
+    width: 100%;
+    min-height: 190px;
+    padding: 22px;
+    background-color: #E8EDF0;
+    border: 1px dashed #B7C7D1;
+    border-radius: 8px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    text-align: center;
+    color: #536675;
+}
+
+.photo-placeholder[hidden] {
+    display: none;
+}
+
+.photo-icon {
+    font-size: 32px;
+    color: #7892A4;
+}
+
+.photo-placeholder strong {
+    font-size: 14px;
+    color: #163B5C;
+}
+
+.photo-placeholder p {
+    font-size: 12px;
+    line-height: 1.5;
+    max-width: 220px;
+}
+
+/* End building photograph placeholder */
