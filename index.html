@@ -50,6 +50,12 @@
             <!-- reset the map to original -->
             <button id="reset-map">Reset Map</button>
 
+        <!--
+            PROPERTY STREET VIEW
+            
+            Initially displays placeholder text and icon
+            When a parcel is selected, the street view image is displayed
+        -->
             <div class="building-photo">
                 <div id="photo-placeholder" class="photo-placeholder">
                     <span class="photo-icon">▧</span>
@@ -82,6 +88,15 @@
                 </a>
             </div>
 
+        <!--
+            CANDIDATE PROPERTY DIRECTORY
+            
+            Displays a list of candidate properties in the sidebar
+            The list is populated from the GeoJSON data file
+            
+            Users can expand an address group, hove to highlight
+            a property, and click to select it on the map
+        -->
             <div class="parcel-directory">
                 <h3>Candidate Properties</h3>
                 <p id="parcel-count">Loading properties...</p>

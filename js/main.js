@@ -1,3 +1,19 @@
+/*
+
+ * PIERCE COUNTY PILOT STUDY - INTERACTIVE WEB MAP
+ *
+ * This script manages the Mapbox map and the candidate property sidebar.
+ * 
+ * Main functionality:
+ *  - Load parcel data from a GeoJSON file
+ *  - Organize parcels into address groups for display in the sidebar
+ *  - Display parcel locations, boundaries, and highlights
+ *  - Group related unit parcels under a single address in the sidebar
+ *  - Enable selection of parcels from the map or sidebar, updating the map view and sidebar details
+ *  - Display property information, including address, parcel number, HVAC description, and a Google Street View image
+ *  - Reset the map
+ */
+
 
 mapboxgl.accessToken = "pk.eyJ1IjoicGFpc2xleXc4MjkiLCJhIjoiY21oZTY4Z3h6MGFpbzJsb2UzbWkxZjZybyJ9.qvAAm5rLQZPLPn8ltX2vLg";
 
@@ -11,11 +27,18 @@ const map = new mapboxgl.Map({
     zoom: 10
 });
 
-
+// Store parcel information in a lookup table,
+// using the parcel number as the unique identifier.
+//
+// Each entry contains:
+// - Property address
+// - HVAC description
+// - Bounding box for the parcel's geometry
+//
+// Multiple polygon features may share the same parcel number
+// Grouping by parcel number avoids duplicate parcel entries
 const parcelLookup = new Map();
-
-// Collecting boundaries of every polygon belonging to a parcel
-function extendBounds(bounds, coords) {
+function extendBounds(bounds, coords) {     // recursively extend bounds for nested coordinates
     if (typeof coords[0] === 'number') {
         bounds.extend(coords);
     } else {
@@ -50,9 +73,20 @@ function updateBuildingPhoto(address) {
 }
 
 
-// Select a parcel from the map or sidebar
-// and just realize we need a reset button i will make it P
-
+// SELECT PARCEL
+//
+// Function to select a candidate parcel, called when either:
+// 1. A parcel is clicked on the map, or
+// 2. A parcel is clicked in the sidebar list.
+//
+// After selection, this function:
+// - zooms to the parcel on the map
+// - highlights the parcel on the map
+// - updates the sidebar with property information
+// - updates the Google Maps link for the property
+// - highlights the selected parcel in the sidebar
+// - expands the property group in the sidebar if applicable
+// - updates the Street View photograph for the property
 function selectParcel(parcelNumber) {
 
     const parcel = parcelLookup.get(parcelNumber);
@@ -145,7 +179,13 @@ function selectParcel(parcelNumber) {
         data: "assets/combinedNEW4326.geojson"
     });
 
-        // Group repeated polygons by their unique parcel number
+        // Build the parcel lookup from the GeoJSON features
+        //
+        // Multiple features may share the same parcel number (e.g., multiple units)
+        // There is one entry in the lookup for each unique parcel number,
+        // and its bounding box is extended to include all geometries for that parcel
+        // 
+        // This allows multiple geometries to be treated as a single parcel for selection and highlighting
         for (const feature of geojson.features) {
             const id = String(
                 feature.properties["Parcel Number"] ?? ""
@@ -373,7 +413,15 @@ function selectParcel(parcelNumber) {
 
 
 
-    // Group parcels by their shared street address.
+    // GROUP PARCEL RECORDS BY STREET ADDRESS
+    //
+    // Some properties have multiple units, each with its own parcel number
+    // This function groups parcels by their street address, ignoring unit identifiers
+    //
+    // Individual parcel records remain available inside the expandable property group in the sidebar
+    //
+    // ADDRESS-BASED GROUPING:
+    // Do not assume records belong to same property
     function getGroupAddress(address) {
         return address.trim()
             .replace(/\s+/g, " ")
@@ -400,6 +448,22 @@ function selectParcel(parcelNumber) {
     const sortedGroups = [...propertyGroups.entries()].sort(
         (a, b) => a[0].localeCompare(b[0], undefined, { numeric: true })
     );
+
+
+
+    // GENERATE CANDIDATE PROPERTY DIRECTORY
+    //
+    // Create expandable HTML details cards for each address group
+    // Each card contains a list of individual parcels (units) for that address
+    //
+    // Interactions:
+    // - Hovering over a property group highlights all parcels for that address on the map
+    // - Hovering over an individual parcel highlights only that parcel on the map
+    // - Clicking a parcel selects it, zooms to it, and updates the sidebar with its details
+    // - Clicking a property group does not select any parcel, but expands/collapses the list of units
+    // - The selected parcel is highlighted in the sidebar and on the map
+    //
+    // This structure allows users to easily explore properties with multiple units while maintaining clear visual feedback on the map and in the sidebar.
 
     for (const [groupAddress, parcels] of sortedGroups) {
 
@@ -508,7 +572,15 @@ function selectParcel(parcelNumber) {
 
 
 
-// reset the map
+    // RESET MAP
+    //
+    // Return application to its initial state:
+    // - Zoom to the original Pierce County view
+    // - Remove any selected parcel highlight
+    // - Reset building information in the sidebar
+    // - Hide the building photo and Google Maps link
+    // - Clear all selected parcel buttons in the sidebar
+    // - Collapse all property groups in the sidebar
     document.getElementById("reset-map").addEventListener("click", () => {
 
         // Return to the original Pierce County view
@@ -558,10 +630,14 @@ function selectParcel(parcelNumber) {
         });
 
     });
-/////////////////// end reset button here ////////////////////////////////////
 
-/////////////////// resize sidebar here //////////////////////////////////////
-// resize sidebar by dragging its right edge
+
+// RESIZABLE SIDEBAR
+//
+// Allow users to drag the sidebars right edge to resize it
+// 
+// Pointer events track the drag interaction
+// map.resize() updates the Mapbox canvas to match new sidebar width
 const sidebar = document.getElementById("sidebar");
 const resizer = document.getElementById("sidebar-resizer");
 
