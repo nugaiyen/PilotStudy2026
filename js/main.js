@@ -1,7 +1,7 @@
 
 mapboxgl.accessToken = "pk.eyJ1IjoicGFpc2xleXc4MjkiLCJhIjoiY21oZTY4Z3h6MGFpbzJsb2UzbWkxZjZybyJ9.qvAAm5rLQZPLPn8ltX2vLg";
 
-const GOOGLE_MAPS_API_KEY = "AIzaSyC2bKWmJ_Dl1bnwRzrA_CwDoK3XUZLUm_o";
+const GOOGLE_MAPS_API_KEY = "AIzaSyC2bKWmJ_Dl1bnwRzrA_CwDoK3XUZLUm_o";  // seceret api key DO NOT SHARE
 
 // initialize the map
 const map = new mapboxgl.Map({
@@ -25,6 +25,9 @@ function extendBounds(bounds, coords) {
 
 // building photo on the side bar using google street view
 function updateBuildingPhoto(address){
+    // show the photo when parcel is selected
+    document.getElementById("building-photo").style.display = "block";
+
     const photo = document.getElementById("building-photo");
     const location = address + ", Pierce County, WA";
     const url = new URL("https://maps.googleapis.com/maps/api/streetview");
@@ -279,4 +282,33 @@ function selectParcel(parcelNumber) {
         console.error("Error loading parcel data:", error);
     }
 
+});
+
+// reset the map
+document.getElementById("reset-map").addEventListener("click", () => {
+
+    // return to the original pierce county view
+    map.flyTo({
+        center: [-122.50, 47.22],
+        zoom: 10
+    });
+
+    // remove selected parcel hightlight
+    map.setFilter("housing-selected", [
+        "==",
+        ["get", "Parcel Number"],
+        ""
+    ]);
+
+    // reset building info
+    document.getElementById("selected-parcel-number").textContent = "";
+    document.getElementById("parcel-details").hidden = true;
+
+    // restore the default photo or no i dont know what should we put back there
+    document.getElementById("building-photo").style.display = "none";
+
+    // clear the selected parcel in the sidebar
+    document.querySelectorAll(".parcel-item").forEach(button => {
+        button.classList.remove("selected");
+    });
 });
