@@ -1,6 +1,8 @@
 
 mapboxgl.accessToken = "pk.eyJ1IjoicGFpc2xleXc4MjkiLCJhIjoiY21oZTY4Z3h6MGFpbzJsb2UzbWkxZjZybyJ9.qvAAm5rLQZPLPn8ltX2vLg";
 
+const GOOGLE_MAPS_API_KEY = "AIzaSyC2bKWmJ_Dl1bnwRzrA_CwDoK3XUZLUm_o";
+
 // initialize the map
 const map = new mapboxgl.Map({
     container: "map",  // connect to the html map container
@@ -21,7 +23,20 @@ function extendBounds(bounds, coords) {
     }
 }
 
+// building photo on the side bar using google street view
+function updateBuildingPhoto(address){
+    const photo = document.getElementById("building-photo");
+    const location = address + ", Pierce County, WA";
+    const url = new URL("https://maps.googleapis.com/maps/api/streetview");
+
+    url.searchParams.set("size", "600x300");
+    url.searchParams.set("location", location);
+    url.searchParams.set("key", GOOGLE_MAPS_API_KEY)
+    photo.src = url.toString();
+}
+
 // Select a parcel from the map or sidebar
+// and just realize we need a reset button i will make it P
 function selectParcel(parcelNumber) {
     const parcel = parcelLookup.get(parcelNumber);
     if (!parcel) return;
@@ -42,6 +57,7 @@ function selectParcel(parcelNumber) {
 
     // Update building information
     document.getElementById("address").textContent = parcel.address;
+    updateBuildingPhoto(parcel.address);  // show the selected property's street view photo
     document.getElementById("selected-parcel-number").textContent = parcelNumber;
     document.getElementById("parcel-details").hidden = false;
     document.getElementById("selected-hvac").textContent = parcel.hvac;

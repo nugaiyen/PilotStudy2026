@@ -48,8 +48,12 @@
             <h2>Building Information</h2>
 
             <div class="building-photo">
-                <img src="assets/building-placeholder.jpg"
-                    alt="Building photo">
+                <!-- note: just in case i cant find this line highlighthighlighthighlight -->
+                <!-- <img src="assets/building-placeholder.jpg"
+                    alt="Building photo"> -->
+                <img id="building-photo"
+                     src="assets/building-placeholder.jpg"
+                     alt="Building photo"
             </div>
 
             <div class="building-details">
@@ -58,6 +62,8 @@
 
                 <div id="parcel-details" hidden>
                     <p>Parcel Number: <span id="selected-parcel-number"></span></p>
+                    <!-- add: HVAC info appears when parcel being select -->
+                    <p>HVAC Description: <span id="selected-hvac"></span></p>
                 </div>
 
                 <a id="google-maps-link"
