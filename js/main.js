@@ -39,8 +39,7 @@ dataBtn.addEventListener("click", () => {
     dataBtn.classList.toggle("active");
 }); // end nav bar stuff
 
- // allow lcoation 
-// allow location
+// allow lcoation 
 map.addControl(
     new mapboxgl.GeolocateControl({
         positionOptions: {
