@@ -28,16 +28,29 @@ const map = new mapboxgl.Map({
 });
 
 
+
+
+// nav bar button for data sources
 const dataBtn = document.getElementById("data-btn");
 const dataPopup = document.getElementById("data-popup");
 
 dataBtn.addEventListener("click", () => {
     dataPopup.classList.toggle("show");
     dataBtn.classList.toggle("active");
-});
+}); // end nav bar stuff
 
-
-
+ // allow lcoation 
+// allow location
+map.addControl(
+    new mapboxgl.GeolocateControl({
+        positionOptions: {
+            enableHighAccuracy: true
+        },
+        trackUserLocation: true,
+        showUserHeading: true
+    }),
+    "top-right"
+);// allow location ends
 
 
 
@@ -264,8 +277,20 @@ function selectParcel(parcelNumber) {
         type: "fill",
         source: "pierce-county",
         paint: {
-            "fill-color": "#3440bc",
-            "fill-opacity": 0.2
+            "fill-color": "#9dc3d8",
+            "fill-opacity": 0.15
+        }
+    });
+
+
+    // County outline
+    map.addLayer({
+        id: "county-outline",
+        type: "line",
+        source: "pierce-county",
+        paint: {
+            "line-color": "#236d98",
+            "line-width": 1,
         }
     });
 
@@ -583,6 +608,8 @@ function selectParcel(parcelNumber) {
         console.error("Error loading parcel data:", error);
     }
 
+
+   
 });
 /////////////////// reset button here ///////////////////////////////////////
 
@@ -693,3 +720,4 @@ function stopResizing() {
 resizer.addEventListener("pointerup", stopResizing);
 resizer.addEventListener("pointercancel", stopResizing);
 /////////////////// end resize sidebar here ///////////////////////////////////
+

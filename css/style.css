@@ -439,4 +439,14 @@ body {
 /* End building photograph placeholder */
 
 
+/* Location */
+
+.maplibregl-ctrl-top-right {
+    display: block;
+    z-index: 10;
+}
+
+.maplibregl-ctrl-group {
+    display: block;
+}
 
