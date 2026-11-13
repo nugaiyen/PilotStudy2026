@@ -100,8 +100,6 @@ function selectParcel(parcelNumber) {
         data: "assets/combinedNEW4326.geojson"
     });
 
-
-
         // Group repeated polygons by their unique parcel number
         for (const feature of geojson.features) {
             const id = String(
@@ -125,8 +123,6 @@ function selectParcel(parcelNumber) {
         feature.geometry.coordinates
         );
     }
-
-
 
     // create dots for each parcel
     // this part is just for testing data
@@ -245,6 +241,46 @@ function selectParcel(parcelNumber) {
             selectParcel(id);
         });
     });
+
+    //////////////// new popup & hover function //////////////////////
+    const hoverPopup = new mapboxgl.Popup({
+        closeButton: false,
+        closeOnClick: false,
+        offset: 12
+    });
+
+    // show parcel info when hovering
+    ["housing-polygon", "parcel-markers"].forEach(layer => {
+        map.on("mouseenter", layer, (e) => {
+            // change the cursor to pointer
+            map.getCanvas().style.cursor = "pointer";
+        });
+
+        map.on("mousemove", layer, (e) => {
+            // get parcel number
+            const parcelNumber = String(
+                e.features[0].properties["Parcel Number"]
+            );
+
+            // find parcel info
+            const parcel = parcelLookup.get(parcelNumber);
+            if (!parcel) return;
+
+            // display popup near cursor
+            hoverPopup
+                .setLngLat(e.lngLat)
+                .setText(`${parcel.address} | Parcel ${parcelNumber}`)  // text shown in the popup
+                .addTo(map);
+        });
+
+        map.on("mouseleave", layer, () => {
+            // restore cursor
+            map.getCanvas().style.cursor = "";
+            //remove popup
+            hoverPopup.remove();
+        });
+    });
+    //////////////// end new popup & hover function //////////////////
 
         // Create clickable list in left sidebar
         const list = document.getElementById("parcel-list");
