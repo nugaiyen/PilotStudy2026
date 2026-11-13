@@ -26,19 +26,21 @@
             <p>Residential Building Identification</p>
         </div>
 
-        <div class="nav-right">
-            <div class="nav-search">
-                <input type="text" placeholder="Search address or parcel...">
-                <button>Search</button>
-            </div>
 
-            <nav class="nav-links">
-                <a href="index.html" class="active">Map</a>
-                <a href="data.html">Project & Data</a>
-            </nav>
-        </div>
-    </header>
-    <!-- End navigation Bar -->
+            <div class="nav-button">
+                <div class="dropdown-wrapper">
+                    <button type="button" id="data-btn">Data</button>
+                    <div id="data-popup" class="dropdown-popup">
+                        <h3>Datasets Used</h3>
+                        <a href="https://gisdata-piercecowa.opendata.arcgis.com/datasets/piercecowa::tax-parcels/explore?location=47.068072%2C-122.155081%2C0.00" target="_blank">Pierce County Parcels</a>
+                        <a href="https://www.piercecountywa.gov/736/Data-Downloads" target="_blank">Property Information (improvement builtas)</a>
+                    </div>
+                </div>
+            </div>
+  
+    </header> <!-- end nav bar -->
+
+
 
 
     <div class="main-container">
@@ -47,8 +49,6 @@
 
             <h2>Building Information</h2>
 
-            <!-- reset the map to original -->
-            <button id="reset-map">Reset Map</button>
 
         <!--
             PROPERTY STREET VIEW
@@ -97,13 +97,19 @@
             Users can expand an address group, hove to highlight
             a property, and click to select it on the map
         -->
-            <div class="parcel-directory">
-                <h3>Candidate Properties</h3>
-                <p id="parcel-count">Loading properties...</p>
+        <div class="parcel-directory">
 
-                <div id="parcel-list"></div>
+            <div class="parcel-header">
+                <div>
+                    <h3>Candidate Properties</h3>
+                    <p id="parcel-count">Loading properties...</p>
+                </div>
+
+                <button id="reset-map">Reset Selection</button>
             </div>
-            <div id="sidebar-resizer"></div>
+
+            <div id="parcel-list"></div>
+
         </aside>
         <!-- End left building information panel -->
 

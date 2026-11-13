@@ -27,6 +27,20 @@ const map = new mapboxgl.Map({
     zoom: 10
 });
 
+
+const dataBtn = document.getElementById("data-btn");
+const dataPopup = document.getElementById("data-popup");
+
+dataBtn.addEventListener("click", () => {
+    dataPopup.classList.toggle("show");
+    dataBtn.classList.toggle("active");
+});
+
+
+
+
+
+
 // Store parcel information in a lookup table,
 // using the parcel number as the unique identifier.
 //
@@ -71,6 +85,8 @@ function updateBuildingPhoto(address) {
 
     photo.src = url.toString();
 }
+
+
 
 
 // SELECT PARCEL
