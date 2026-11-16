@@ -17,7 +17,8 @@
 
 mapboxgl.accessToken = "pk.eyJ1IjoicGFpc2xleXc4MjkiLCJhIjoiY21oZTY4Z3h6MGFpbzJsb2UzbWkxZjZybyJ9.qvAAm5rLQZPLPn8ltX2vLg";
 
-const GOOGLE_MAPS_API_KEY = "AIzaSyC2bKWmJ_Dl1bnwRzrA_CwDoK3XUZLUm_o";  // seceret api key DO NOT SHARE
+const GOOGLE_MAPS_API_KEY = "";  // delete api key cuz theres security issue occurs
+                                 // stop using this function
 
 // initialize the map
 const map = new mapboxgl.Map({
